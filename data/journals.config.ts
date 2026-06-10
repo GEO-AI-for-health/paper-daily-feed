@@ -78,6 +78,11 @@ const journals: Journal[] = [
     rss: "https://www.tandfonline.com/feed/rss/tgis20"
   },
   {
+    name: "International Journal of Applied Earth Observation and Geoinformation",
+    abbr: "JAG",
+    rss: "https://rss.sciencedirect.com/publication/science/15698432"
+  },
+  {
     name: "Cities",
     rss: "https://rss.sciencedirect.com/publication/science/02642751"
   },
@@ -143,6 +148,11 @@ const journals: Journal[] = [
     name: "Sustainable Cities and Society",
     abbr: "SCS",
     rss: "https://rss.sciencedirect.com/publication/science/22106707"
+  },
+  {
+    name: "Environmental Science & Technology",
+    abbr: "ES&T",
+    rss: "https://pubs.acs.org/action/showFeed?ui=0&mi=qot5m1&ai=54t&jc=esthag&type=etoc&feed=rss"
   },
   {
     name: "ISPRS Journal of Photogrammetry and Remote Sensing",
