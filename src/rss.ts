@@ -43,6 +43,7 @@ const RSS_HEADERS = {
   Accept: "application/rss+xml, application/xml, text/xml, */*",
   "User-Agent": "paper-daily-feed/0.1 (+https://github.com/nehSgnaiL/paper-daily-feed)"
 };
+const RETRYABLE_STATUS_CODES = new Set([429, 500, 502, 503, 504]);
 
 type FetchableFeed = Journal | FeedSource;
 
@@ -65,6 +66,28 @@ type CrossrefResponse = {
 
 function feedLabel(feed: FetchableFeed): string {
   return "kind" in feed ? feed.name : (feed.abbr ?? feed.name);
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetry(input: string | URL, init: RequestInit, attempts = 3): Promise<Response> {
+  let response: Response | undefined;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    response = await fetch(input, init);
+    if (!RETRYABLE_STATUS_CODES.has(response.status) || attempt === attempts) {
+      return response;
+    }
+
+    const retryAfterSeconds = Number(response.headers.get("retry-after"));
+    const delayMs = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
+      ? retryAfterSeconds * 1000
+      : attempt * 1000;
+    await sleep(delayMs);
+  }
+
+  return response as Response;
 }
 
 function asStringArray(value: string | string[] | undefined): string[] {
@@ -413,7 +436,7 @@ async function fetchCrossrefFeed(journal: FetchableFeed): Promise<FeedPaper[]> {
   endpoint.searchParams.set("order", "desc");
   endpoint.searchParams.set("select", "DOI,URL,title,abstract,author,published,published-online,published-print");
 
-  const response = await fetch(endpoint, { headers: RSS_HEADERS });
+  const response = await fetchWithRetry(endpoint, { headers: RSS_HEADERS });
   if (!response.ok) {
     throw new Error(`Crossref fallback status code ${response.status}`);
   }
@@ -443,7 +466,7 @@ async function fetchCrossrefFeed(journal: FetchableFeed): Promise<FeedPaper[]> {
 }
 
 export async function fetchJournalFeed(journal: FetchableFeed): Promise<FeedPaper[]> {
-  const response = await fetch(journal.rss, {
+  const response = await fetchWithRetry(journal.rss, {
     headers: RSS_HEADERS
   });
 

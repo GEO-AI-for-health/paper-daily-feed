@@ -301,6 +301,28 @@ describe("normalizeFeedItem", () => {
     });
   });
 
+  it("retries transient RSS failures", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response("", { status: 502 }))
+      .mockResolvedValueOnce(
+        new Response(
+          `<?xml version="1.0"?><rss version="2.0"><channel><item><title>Recovered paper</title><link>https://example.test/recovered</link></item></channel></rss>`,
+          { status: 200 }
+        )
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const papers = await fetchJournalFeed({
+      name: "IEEE Transactions on Geoscience and Remote Sensing",
+      abbr: "IEEE TGRS",
+      rss: "https://example.test/tgrs.rss"
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(papers[0]?.title).toBe("Recovered paper");
+  });
+
   it("uses feed source names as fetched paper labels", async () => {
     vi.stubGlobal(
       "fetch",
