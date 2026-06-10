@@ -262,6 +262,45 @@ describe("normalizeFeedItem", () => {
     );
   });
 
+  it("falls back to Crossref when a catalog RSS feed is blocked", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response("", { status: 403 }))
+      .mockResolvedValueOnce(
+        Response.json({
+          message: {
+            items: [
+              {
+                DOI: "10.1234/example",
+                title: ["GeoAI for environmental exposure"],
+                abstract: "<jats:p>Exposure modeling with mobility data.</jats:p>",
+                author: [{ given: "Linsen", family: "Wang" }],
+                published: { "date-parts": [[2026, 6, 10]] }
+              }
+            ]
+          }
+        })
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const papers = await fetchJournalFeed({
+      name: "Environmental Science & Technology",
+      abbr: "ES&T",
+      rss: "https://example.test/blocked.rss",
+      crossrefIssn: "1520-5851"
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(String(fetchMock.mock.calls[1]?.[0])).toContain("api.crossref.org/journals/1520-5851/works");
+    expect(papers[0]).toMatchObject({
+      journal: "ES&T",
+      title: "GeoAI for environmental exposure",
+      url: "https://doi.org/10.1234/example",
+      authors: ["Linsen Wang"],
+      publishedAt: new Date("2026-06-10T00:00:00.000Z")
+    });
+  });
+
   it("uses feed source names as fetched paper labels", async () => {
     vi.stubGlobal(
       "fetch",
