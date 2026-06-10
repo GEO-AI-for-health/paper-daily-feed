@@ -46,6 +46,23 @@ const RSS_HEADERS = {
 
 type FetchableFeed = Journal | FeedSource;
 
+type CrossrefWork = {
+  DOI?: string;
+  URL?: string;
+  title?: string[];
+  abstract?: string;
+  author?: Array<{ given?: string; family?: string }>;
+  published?: { "date-parts"?: number[][] };
+  "published-online"?: { "date-parts"?: number[][] };
+  "published-print"?: { "date-parts"?: number[][] };
+};
+
+type CrossrefResponse = {
+  message?: {
+    items?: CrossrefWork[];
+  };
+};
+
 function feedLabel(feed: FetchableFeed): string {
   return "kind" in feed ? feed.name : (feed.abbr ?? feed.name);
 }
@@ -376,12 +393,65 @@ export function normalizeFeedItem(journal: string, item: ParserItem): FeedPaper 
   };
 }
 
+function crossrefDate(work: CrossrefWork): Date | null {
+  const parts =
+    work["published-online"]?.["date-parts"]?.[0] ??
+    work["published-print"]?.["date-parts"]?.[0] ??
+    work.published?.["date-parts"]?.[0];
+  const [year, month = 1, day = 1] = parts ?? [];
+  return year ? new Date(Date.UTC(year, month - 1, day)) : null;
+}
+
+async function fetchCrossrefFeed(journal: FetchableFeed): Promise<FeedPaper[]> {
+  if (!journal.crossrefIssn) {
+    return [];
+  }
+
+  const endpoint = new URL(`https://api.crossref.org/journals/${encodeURIComponent(journal.crossrefIssn)}/works`);
+  endpoint.searchParams.set("rows", "100");
+  endpoint.searchParams.set("sort", "published");
+  endpoint.searchParams.set("order", "desc");
+  endpoint.searchParams.set("select", "DOI,URL,title,abstract,author,published,published-online,published-print");
+
+  const response = await fetch(endpoint, { headers: RSS_HEADERS });
+  if (!response.ok) {
+    throw new Error(`Crossref fallback status code ${response.status}`);
+  }
+
+  const payload = (await response.json()) as CrossrefResponse;
+  return (payload.message?.items ?? []).flatMap((work) => {
+    const title = stripHtml(work.title?.[0] ?? "");
+    const url = work.URL ?? (work.DOI ? `https://doi.org/${work.DOI}` : "");
+    if (!title || !url) {
+      return [];
+    }
+
+    const authors = (work.author ?? [])
+      .map(({ given, family }) => [given, family].filter(Boolean).join(" ").trim())
+      .filter(Boolean);
+    return [
+      {
+        journal: feedLabel(journal),
+        title,
+        abstract: stripHtml(work.abstract ?? ""),
+        url,
+        publishedAt: crossrefDate(work),
+        ...(authors.length > 0 ? { authors } : {})
+      }
+    ];
+  });
+}
+
 export async function fetchJournalFeed(journal: FetchableFeed): Promise<FeedPaper[]> {
   const response = await fetch(journal.rss, {
     headers: RSS_HEADERS
   });
 
   if (!response.ok) {
+    if (journal.crossrefIssn) {
+      console.warn(`${feedLabel(journal)} RSS returned ${response.status}; using Crossref fallback.`);
+      return fetchCrossrefFeed(journal);
+    }
     throw new Error(`Status code ${response.status}`);
   }
 

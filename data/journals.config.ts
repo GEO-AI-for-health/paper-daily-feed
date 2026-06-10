@@ -10,6 +10,7 @@ type Journal = {
   name: string;
   abbr?: string;
   rss: string;
+  crossrefIssn?: string;
 };
 
 // stored data
@@ -60,7 +61,8 @@ const journals: Journal[] = [
   {
     name: "Annals of the American Association of Geographers",
     abbr: "AAAG",
-    rss: "https://www.tandfonline.com/feed/rss/raag21"
+    rss: "https://www.tandfonline.com/feed/rss/raag21",
+    crossrefIssn: "2469-4452"
   },
   {
     name: "Computers, Environment and Urban Systems",
@@ -75,7 +77,8 @@ const journals: Journal[] = [
   {
     name: "International Journal of Geographical Information Science",
     abbr: "IJGIS",
-    rss: "https://www.tandfonline.com/feed/rss/tgis20"
+    rss: "https://www.tandfonline.com/feed/rss/tgis20",
+    crossrefIssn: "1365-8816"
   },
   {
     name: "International Journal of Applied Earth Observation and Geoinformation",
@@ -152,7 +155,8 @@ const journals: Journal[] = [
   {
     name: "Environmental Science & Technology",
     abbr: "ES&T",
-    rss: "https://pubs.acs.org/action/showFeed?ui=0&mi=qot5m1&ai=54t&jc=esthag&type=etoc&feed=rss"
+    rss: "https://pubs.acs.org/action/showFeed?ui=0&mi=qot5m1&ai=54t&jc=esthag&type=etoc&feed=rss",
+    crossrefIssn: "1520-5851"
   },
   {
     name: "ISPRS Journal of Photogrammetry and Remote Sensing",
