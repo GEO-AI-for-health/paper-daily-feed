@@ -3408,6 +3408,22 @@
     {
       "fingerprint": "2f9a2bf8fff8008c9504ff1c488765f1993de9f3a791614bdd40d9e5e456e7fa",
       "deliveredAt": "2026-09-22T00:48:55.649Z"
+    },
+    {
+      "fingerprint": "6c1de2bc7289a60424f47a0c1c988fbb6efb488914665520babe064581ec2e21",
+      "deliveredAt": "2026-09-23T00:29:04.827Z"
+    },
+    {
+      "fingerprint": "f06608fbbeb382b87083bdb211a4846959dd8a30430541e07d8405e4035d28f9",
+      "deliveredAt": "2026-09-23T00:29:04.827Z"
+    },
+    {
+      "fingerprint": "2aea842795a18f0babe09bc1eb4dff2607e905a1ffca7c278e7719534a1e10fc",
+      "deliveredAt": "2026-09-23T00:29:04.827Z"
+    },
+    {
+      "fingerprint": "48c356c61bea42fd8e2cd889705c09e29c1eee730095587cc298a350ffbd95ea",
+      "deliveredAt": "2026-09-23T00:29:04.827Z"
     }
   ]
 }
