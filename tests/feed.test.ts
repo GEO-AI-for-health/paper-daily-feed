@@ -262,6 +262,22 @@ describe("normalizeFeedItem", () => {
     );
   });
 
+  it("normalizes Atom entries with object-shaped summary text", () => {
+    const paper = normalizeFeedItem("ICML", {
+      title: "GeoAI foundation models for urban sensing",
+      link: "https://arxiv.org/abs/2601.12345",
+      summary: { _: "A multimodal GeoAI paper." } as unknown as string,
+      isoDate: "2026-01-02T00:00:00Z"
+    });
+
+    expect(paper).toMatchObject({
+      journal: "ICML",
+      title: "GeoAI foundation models for urban sensing",
+      abstract: "A multimodal GeoAI paper.",
+      publishedAt: new Date("2026-01-02T00:00:00.000Z")
+    });
+  });
+
   it("falls back to Crossref when a catalog RSS feed is blocked", async () => {
     const fetchMock = vi
       .fn()

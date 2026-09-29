@@ -143,6 +143,36 @@ const journals: Journal[] = [
     rss: "https://ieeexplore.ieee.org/rss/TOC36.XML"
   },
   {
+    name: "IEEE Transactions on Pattern Analysis and Machine Intelligence",
+    abbr: "IEEE TPAMI",
+    rss: "https://ieeexplore.ieee.org/rss/TOC34.XML"
+  },
+  {
+    name: "IEEE Transactions on Image Processing",
+    abbr: "IEEE TIP",
+    rss: "https://ieeexplore.ieee.org/rss/TOC83.XML"
+  },
+  {
+    name: "International Conference on Machine Learning",
+    abbr: "ICML",
+    rss: "https://export.arxiv.org/api/query?search_query=all:ICML&sortBy=submittedDate&sortOrder=descending&max_results=100"
+  },
+  {
+    name: "IEEE/CVF Conference on Computer Vision and Pattern Recognition",
+    abbr: "CVPR",
+    rss: "https://export.arxiv.org/api/query?search_query=all:CVPR&sortBy=submittedDate&sortOrder=descending&max_results=100"
+  },
+  {
+    name: "AAAI Conference on Artificial Intelligence",
+    abbr: "AAAI",
+    rss: "https://export.arxiv.org/api/query?search_query=all:AAAI&sortBy=submittedDate&sortOrder=descending&max_results=100"
+  },
+  {
+    name: "International Conference on Learning Representations",
+    abbr: "ICLR",
+    rss: "https://export.arxiv.org/api/query?search_query=all:ICLR&sortBy=submittedDate&sortOrder=descending&max_results=100"
+  },
+  {
     name: "International Journal of Digital Earth",
     abbr: "IJDE",
     rss: "https://www.tandfonline.com/feed/rss/tjde20"

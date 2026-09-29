@@ -97,8 +97,17 @@ function asStringArray(value: string | string[] | undefined): string[] {
   return Array.isArray(value) ? value : [value];
 }
 
-function normalizeField(value: string): string {
-  return stripHtml(value).replace(/\s+/g, " ").trim();
+function normalizeField(value: unknown): string {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  if (typeof value === "object") {
+    const maybeText = value as { _: unknown; "#": unknown; text: unknown; value: unknown };
+    return normalizeField(maybeText._ ?? maybeText["#"] ?? maybeText.text ?? maybeText.value ?? "");
+  }
+
+  return stripHtml(String(value)).replace(/\s+/g, " ").trim();
 }
 
 function itemText(item: ParserItem): string {
